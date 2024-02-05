@@ -59,24 +59,16 @@ async def models_list():
     output = [i for i in config["models"]]
     return {"models": output}
 
-
-@app.get("/label")
-async def predict_label(
-    q: List[str] = Query(
-        ...,
-        title="query string",
-        description="Description of the product to be classified",
-    ),
-    k: int = Query(
-        1, title="top-K", description="Specify number of predictions to be displayed"
-    ),
-    v: Optional[bool] = Query(
-        False, title="verbosity", description="If True, add the label of code category"
-    ),
-    n: Literal["na2008", "coicop", "na2008_old", "all"] = Query(
-        "all", title="nomenclature", description="Classification system desired"
-    ),
-):
+cache = {}
+def get_in_cache_else_return(function_call, function_name, argument):
+    cache_key=f"{function_name}-{argument}"
+    if cache_key in cache:
+        return cache[cache_key]
+    else:
+        cache[cache_key] = function_call
+        return cache[cache_key]
+    
+def predict_label_core(q:str,k:int,v:Optional[bool],n:Literal["na2008", "coicop", "na2008_old", "all"]):
     if n == "all":
         n = [i for i in config["models"]]
     if type(n) == str:
@@ -99,7 +91,25 @@ async def predict_label(
         for description, pred in zip(descriptions, preds):
             output[nomenclature][description] = pred
 
-    return output
+
+@app.get("/label")
+async def predict_label(
+    q: List[str] = Query(
+        ...,
+        title="query string",
+        description="Description of the product to be classified",
+    ),
+    k: int = Query(
+        1, title="top-K", description="Specify number of predictions to be displayed"
+    ),
+    v: Optional[bool] = Query(
+        False, title="verbosity", description="If True, add the label of code category"
+    ),
+    n: Literal["na2008", "coicop", "na2008_old", "all"] = Query(
+        "all", title="nomenclature", description="Classification system desired"
+    ),
+):
+    return predict_label_core(q=q,k=k,v=v,n=n)
 
 
 @app.get("/process")
