@@ -8,8 +8,9 @@ Created on Tue Jan 12 11:58:03 2021
 @author: jeremylhour & byl
 """
 import re
-import pandas as pd
 from typing import List
+
+import pandas as pd
 
 
 def predict_using_model(descriptions: List[str], model, k: int = 1):

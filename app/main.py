@@ -5,15 +5,14 @@ Created on Tue Jan 12 11:58:03 2021
 @author: jeremy l'hour, Yves-Laurent Benichou
 """
 
+import csv
+from typing import List, Optional
+
 import fasttext
 import yaml
-import csv
-
-from typing_extensions import Literal
-from typing import Optional, List
 from fastapi import FastAPI, Query
-
-from utils_ddc import preprocess_text, predict_using_model
+from typing_extensions import Literal
+from utils_ddc import predict_using_model, preprocess_text
 
 
 def read_yaml(file):
